@@ -29,10 +29,10 @@
 ＊バグや不明点、要望などがあった場合はTwitter([@JanuaryMaki](https://twitter.com/JanuaryMaki ))か、Discordのコミュニティサーバーへよろしくお願いします。GitHubのissueでは受け付けておりません。
 ###
 ### ｜招待リンク｜
-https://discord.com/oauth2/authorize?client_id=757427376341778494&permissions=522304&scope=bot+applications.commands
+http://invite.simpletimer.dev
 ###
 ### ｜コミュニティサーバー｜
-https://discord.com/invite/qDw5TpXgzr
+http://community.simpletimer.dev
 ###
 ### ｜詳細｜
 https://twitter.com/i/events/1308593708955181056
