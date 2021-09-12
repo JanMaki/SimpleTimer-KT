@@ -4,6 +4,8 @@ import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.JDABuilder
 import net.dv8tion.jda.api.OnlineStatus
 import net.dv8tion.jda.api.entities.Activity
+import net.dv8tion.jda.api.sharding.DefaultShardManagerBuilder
+import net.dv8tion.jda.api.sharding.ShardManager
 import net.necromagic.simpletimerKT.bcdice.BCDiceManager
 import net.necromagic.simpletimerKT.command.CommandManager
 import net.necromagic.simpletimerKT.listener.GenericMessageReaction
@@ -50,7 +52,7 @@ import javax.security.auth.login.LoginException
 // v1.4.8 一時停止が一部動いていなかったのを修正
 // v1.4.9 ダイスのInfoの文字数が多いと表示されなかったのを修正
 // v1.4.10 tokenを外部ファイル(server_config.yml)にて記述するように変更
-
+// v1,4,11
 
 /**
  * メインクラス
@@ -72,14 +74,14 @@ class SimpleTimer{
     }
 
     //バージョン
-    val version = "v1.4.10"
+    val version = "v1.4.11"
 
     //多重起動防止
     private val lockPort = 918
     private lateinit var socket: ServerSocket
 
-    //JDA
-    private lateinit var jda: JDA
+    //ShardManager
+    private lateinit var shardManager: ShardManager
 
     //データ保存用
     lateinit var config: ServerConfig
@@ -144,19 +146,22 @@ class SimpleTimer{
         }
 
         //JDAを作成
+        val jda: JDA?
         val jdaBuilder = JDABuilder.createDefault(token)
+        val shardManagerBuilder = DefaultShardManagerBuilder.createDefault(token)
         try {
             jda = jdaBuilder.build()
+            shardManager = shardManagerBuilder.build()
         } catch (e: LoginException){
             e.printStackTrace()
             return
         }
 
         //リスナーの登録
-        jda.addEventListener(GuildMessageReceived())
-        jda.addEventListener(GenericMessageReaction())
-        jda.addEventListener(MessageDelete())
-        jda.addEventListener(SlashCommand())
+        shardManager.addEventListener(GuildMessageReceived())
+        shardManager.addEventListener(GenericMessageReaction())
+        shardManager.addEventListener(MessageDelete())
+        shardManager.addEventListener(SlashCommand())
 
         //コマンドの登録
         val commands = jda.updateCommands()
