@@ -7,7 +7,7 @@ import net.necromagic.simpletimerKT.util.MessageReply
 /**
  * コマンド実装用のインターフェース
  */
-interface RunCommand{
+interface RunCommand {
     /**
      * コマンドを実行する
      * @param user [User] 実行したユーザー

@@ -9,6 +9,7 @@ import net.necromagic.simpletimerKT.util.MessageReply
 import net.necromagic.simpletimerKT.util.equalsIgnoreCase
 import java.lang.StringBuilder
 import java.util.concurrent.Executors
+
 /**
  * コマンドの管理クラス
  */
@@ -20,8 +21,8 @@ class CommandManager {
         //コマンドを登録
         commands.add(TimerCommand())
         commands.add(DiceCommand())
-        commands.add(CommandData("1d100","100面ダイスを振ります。その他の個数・面数のダイスは!!xDyで使用できます").setDefaultEnabled(true))
-        commands.add(CommandData("s1d100","結果が隠された100面ダイスを振ります。その他の個数・面数のダイスは!!xDyで使用できます").setDefaultEnabled(true))
+        commands.add(CommandData("1d100", "100面ダイスを振ります。その他の個数・面数のダイスは!!xDyで使用できます").setDefaultEnabled(true))
+        commands.add(CommandData("s1d100", "結果が隠された100面ダイスを振ります。その他の個数・面数のダイスは!!xDyで使用できます").setDefaultEnabled(true))
     }
 
     /**
@@ -31,7 +32,7 @@ class CommandManager {
      * @param args [List] 内容
      * @param messageReply [MessageReply] 返信を行うクラス。
      */
-    fun run(user: User, channel: TextChannel, args: List<String>, messageReply: MessageReply){
+    fun run(user: User, channel: TextChannel, args: List<String>, messageReply: MessageReply) {
 
         val command = args[0]
 
@@ -40,62 +41,66 @@ class CommandManager {
         var result = false
 
         //すべてのコマンドの確認
-        commands.forEach{
-            if (it is RunCommand){
-                if ("${prefix}${it.name}".equalsIgnoreCase(command) || "!!${it.name}".equalsIgnoreCase(command)){
+        commands.forEach {
+            if (it is RunCommand) {
+                if ("${prefix}${it.name}".equalsIgnoreCase(command) || "!!${it.name}".equalsIgnoreCase(command)) {
                     it.runCommand(user, channel, args, messageReply)
                     result = true
                 }
             }
         }
 
-        if (!result){
+        if (!result) {
             //ダイスを確認
-            if (args.isNotEmpty() && args[0].replace("||","").length > 1 && args[0].replace("||","").substring(0,1).equalsIgnoreCase(prefix)){
+            if (args.isNotEmpty() && args[0].replace("||", "").length > 1 && args[0].replace("||", "").substring(0, 1)
+                    .equalsIgnoreCase(prefix)
+            ) {
                 //扱い安い形に変更
                 val builder = StringBuilder()
-                args.forEach{
+                args.forEach {
                     builder.append(it)
                 }
-                var diceCommand = builder.toString().replace(prefix,"").toLowerCase()
+                var diceCommand = builder.toString().replace(prefix, "").lowercase()
 
                 Executors.newSingleThreadExecutor().submit {
 
                     //ダイスモードの確認
-                    when(SimpleTimer.instance.config.getDiceMode(channel.guild)){
+                    when (SimpleTimer.instance.config.getDiceMode(channel.guild)) {
                         //SimpleTimerで実装されているタイマー
                         ServerConfig.DiceMode.Default -> {
                             //シークレットダイスの確認
-                            val initialCharIsS = diceCommand.substring(0,1).equalsIgnoreCase("s")
+                            val initialCharIsS = diceCommand.substring(0, 1).equalsIgnoreCase("s")
                             val isSecret = initialCharIsS || diceCommand.contains("||")
                             if (initialCharIsS)
-                                diceCommand = diceCommand.replaceFirst("s","")
+                                diceCommand = diceCommand.replaceFirst("s", "")
                             if (diceCommand.contains("||"))
-                                diceCommand = diceCommand.replace("||","")
+                                diceCommand = diceCommand.replace("||", "")
 
                             //ダイスの実行
-                            if (Dice.checkDiceFormat(diceCommand)){
+                            if (Dice.checkDiceFormat(diceCommand)) {
 
                                 //ダイスを作成
-                                val dice = Dice(diceCommand,isSecret)
+                                val dice = Dice(diceCommand, isSecret)
 
                                 //出力メッセージの作成
-                                val sendMessage = if (isSecret){
+                                val sendMessage = if (isSecret) {
                                     """
                                     (シークレットダイス)${dice.resultMessage}
                                     """.trimIndent()
-                                }else {
+                                } else {
                                     """
                                     ${dice.resultMessage}
                                     """.trimIndent()
                                 }
                                 //2000文字超えたときは失敗のログを出す
-                                if (sendMessage.length >= 2000){
-                                    messageReply.reply("""
+                                if (sendMessage.length >= 2000) {
+                                    messageReply.reply(
+                                        """
                                     出力結果の文字数が多すぎます。
                                     ダイスの内容を変更して再度実行してください。
-                                    """.trimIndent())
-                                }else {
+                                    """.trimIndent()
+                                    )
+                                } else {
                                     //結果を出力する
                                     messageReply.reply(sendMessage)
                                 }
@@ -104,7 +109,11 @@ class CommandManager {
 
                         //BCDice
                         ServerConfig.DiceMode.BCDice -> {
-                            BCDiceManager.instance.roll(channel, args[0].replace(prefix,"").toLowerCase(), messageReply)
+                            BCDiceManager.instance.roll(
+                                channel,
+                                args[0].replace(prefix, "").lowercase(),
+                                messageReply
+                            )
                         }
 
                     }

@@ -7,9 +7,9 @@ import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.entities.MessageEmbed
 import net.dv8tion.jda.api.entities.TextChannel
-import net.dv8tion.jda.api.exceptions.InsufficientPermissionException
 import net.necromagic.simpletimerKT.*
 import net.necromagic.simpletimerKT.bcdice.dataclass.*
+import net.necromagic.simpletimerKT.util.Log
 import net.necromagic.simpletimerKT.util.MessageReply
 import net.necromagic.simpletimerKT.util.equalsIgnoreCase
 import java.awt.Color
@@ -104,23 +104,20 @@ class BCDiceManager {
             if (channelViews.containsKey(channel)){
                 channelViews[channel]?.delete()?.complete()
             }
-        }catch (ignore: Exception){
-        }finally {
-            try {
-                //メッセージを送信
-                val message = channel.sendMessage(embed).complete()
-                //マップに登録
-                channelViews[channel] = message
-                //ページを初期化
-                channelViewsPage[channel] = 1
-                //リアクションを付与
-                message.addReaction("⬅️").queue({}, {})
-                for (emoji in numberEmojis){
-                    message.addReaction(emoji).queue({}, {})
-                }
-                message.addReaction("➡️").queue({},{})
-            }catch (ignore: InsufficientPermissionException){
+            //メッセージを送信
+            val message = channel.sendMessage(embed).complete()
+            //マップに登録
+            channelViews[channel] = message
+            //ページを初期化
+            channelViewsPage[channel] = 1
+            //リアクションを付与
+            message.addReaction("⬅️").queue({}, {})
+            for (emoji in numberEmojis){
+                message.addReaction(emoji).queue({}, {})
             }
+            message.addReaction("➡️").queue({},{})
+        }catch (e: Exception){
+            Log.sendLog(e.stackTraceToString())
         }
     }
 
@@ -189,28 +186,30 @@ class BCDiceManager {
         val gameSystems = gameSystemPages[pageNumber] ?: return
         //ゲームシステムを取得
         val gameSystem = gameSystems[slot-1]
-        //メッセージを送信
-        val selectMessage = channel.sendMessage("ダイスBotを**${gameSystem.name}**に変更しました").complete()
-        selectMessage.addReaction("❓").queue({}, {})
-
-        //コンフィグのインスタンス
-        val config = SimpleTimer.instance.config
-
-        //ダイスモードを自動的に変更する
-        if (config.getDiceMode(channel.guild) == ServerConfig.DiceMode.Default){
-            channel.sendMessage("ダイスモードを**BCDice**に変更しました id:${gameSystem.id}").queue({}, {})
-        }
-
-        config.setDiceBot(channel.guild, gameSystem.id)
-        config.setDiceMode(channel.guild, ServerConfig.DiceMode.BCDice)
-        config.save()
         try {
+            //メッセージを送信
+            val selectMessage = channel.sendMessage("ダイスBotを**${gameSystem.name}**に変更しました").complete()
+            selectMessage.addReaction("❓").queue({}, {})
+
+            //コンフィグのインスタンス
+            val config = SimpleTimer.instance.config
+
+            //ダイスモードを自動的に変更する
+            if (config.getDiceMode(channel.guild) == ServerConfig.DiceMode.Default){
+                channel.sendMessage("ダイスモードを**BCDice**に変更しました id:${gameSystem.id}").queue({}, {})
+            }
+
+            config.setDiceBot(channel.guild, gameSystem.id)
+            config.setDiceMode(channel.guild, ServerConfig.DiceMode.BCDice)
+            config.save()
             //設定画面を消す
             if (channelViews.containsKey(channel)){
                 channelViews[channel]?.delete()?.complete()
             }
             channelViews[channel] = selectMessage
-        }catch (ignore: Exception){}
+        }catch (e: Exception){
+            Log.sendLog(e.stackTraceToString())
+        }
     }
 
     /**

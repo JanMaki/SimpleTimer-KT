@@ -10,7 +10,7 @@ import net.necromagic.simpletimerKT.SimpleTimer
 import java.util.*
 
 class SendMessage {
-    companion object{
+    companion object {
         //権限エラーの埋め込み
         private val errorEmbed: MessageEmbed
 
@@ -36,16 +36,17 @@ class SendMessage {
          * @param string [String] 送信する文字列
          * @param user [User] 送信が失敗したときにエラーを送るユーザー
          */
-        fun sendMessage(channel: TextChannel, string: String, user: User){
+        fun sendMessage(channel: TextChannel, string: String, user: User) {
             try {
-                if (channelsMessageMap.containsKey(channel)){
+                if (channelsMessageMap.containsKey(channel)) {
                     channelsMessageMap[channel]?.delete()?.complete()
                 }
-            }catch (ignore: Exception){
-            }finally {
+            } catch (e: Exception) {
+                Log.sendLog(e.stackTraceToString())
+            } finally {
                 try {
                     channelsMessageMap[channel] = channel.sendMessage(string).complete()
-                }catch (e: InsufficientPermissionException){
+                } catch (e: InsufficientPermissionException) {
                     sendErrorMessageToUser(user)
                 }
             }
@@ -57,11 +58,13 @@ class SendMessage {
          *
          * @param user [User] 対象のユーザー
          */
-        fun sendErrorMessageToUser(user: User){
+        fun sendErrorMessageToUser(user: User) {
             try {
                 val channel = user.openPrivateChannel().complete()
-                channel.sendMessage(errorEmbed).queue({ },{ })
-            }catch (ignore: Exception){}
+                channel.sendMessage(errorEmbed).queue({ }, { })
+            } catch (e: Exception) {
+                Log.sendLog(e.stackTraceToString())
+            }
         }
     }
 }

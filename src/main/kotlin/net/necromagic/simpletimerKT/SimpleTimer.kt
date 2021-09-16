@@ -12,6 +12,7 @@ import net.necromagic.simpletimerKT.listener.GenericMessageReaction
 import net.necromagic.simpletimerKT.listener.GuildMessageReceived
 import net.necromagic.simpletimerKT.listener.MessageDelete
 import net.necromagic.simpletimerKT.listener.SlashCommand
+import net.necromagic.simpletimerKT.util.Log
 import java.io.IOException
 import java.net.ServerSocket
 import java.net.URL
@@ -58,8 +59,8 @@ import javax.security.auth.login.LoginException
  * メインクラス
  *
  */
-class SimpleTimer{
-    companion object{
+class SimpleTimer {
+    companion object {
         lateinit var instance: SimpleTimer
 
         /**
@@ -68,7 +69,7 @@ class SimpleTimer{
          * @param args [Array] 引数（未使用）
          */
         @JvmStatic
-        fun main(args: Array<String>){
+        fun main(args: Array<String>) {
             SimpleTimer()
         }
     }
@@ -89,23 +90,25 @@ class SimpleTimer{
     //コマンド管理
     lateinit var commandManager: CommandManager
 
-    init { init() }
+    init {
+        init()
+    }
 
     /**
      * 起動時処理
      *
      */
-    private fun init(){
+    private fun init() {
         //インターネットの接続の確認
         try {
             val url = URL("https://google.com")
             val connection = url.openConnection()
             connection.getInputStream().close()
-        } catch (ioException: IOException){
+        } catch (ioException: IOException) {
             try {
                 Thread.sleep(5000)
                 init()
-            } catch (interruptedException: InterruptedException){
+            } catch (interruptedException: InterruptedException) {
                 interruptedException.printStackTrace()
             }
             return
@@ -115,10 +118,10 @@ class SimpleTimer{
         var check = true
         try {
             socket = ServerSocket(lockPort)
-        }catch (e: Exception){
+        } catch (e: Exception) {
             check = false
         }
-        if (!check){
+        if (!check) {
             return
         }
 
@@ -136,9 +139,9 @@ class SimpleTimer{
         val token = config.getString("TOKEN", "TOKEN IS HERE")
 
         //トークンがないときに終了する
-        if (token.equals("TOKEN IS HERE", ignoreCase = true)){
+        if (token.equals("TOKEN IS HERE", ignoreCase = true)) {
             //初期値を保存
-            config.set("TOKEN","TOKEN IS HERE")
+            config.set("TOKEN", "TOKEN IS HERE")
             config.save()
             //コンソールに出力
             println("SETUP: Write the token in the \"TOKEN\" field of server_config.yml")
@@ -152,7 +155,7 @@ class SimpleTimer{
         try {
             jda = jdaBuilder.build()
             shardManager = shardManagerBuilder.build()
-        } catch (e: LoginException){
+        } catch (e: LoginException) {
             e.printStackTrace()
             return
         }
@@ -175,5 +178,15 @@ class SimpleTimer{
 
         //BCDiceのマネージャーを開始
         BCDiceManager()
+
+        //ログ
+        val section = config.getConfigurationSection("LoggingServer")
+        section?.getKeys(false)?.forEach { guildID ->
+            val guild = jda.getGuildById(guildID)
+            val channel = guild?.getTextChannelById(config.getString("LoggingServer.${guildID}"))
+            if (channel != null) {
+                Log.logChannels.add(channel)
+            }
+        }
     }
 }

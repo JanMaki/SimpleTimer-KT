@@ -20,7 +20,7 @@ data class GameSystem(
     val id: String,
 
     @SerialName("name")
-    val name:String,
+    val name: String,
 
     @SerialName("sort_key")
     val sort_key: String

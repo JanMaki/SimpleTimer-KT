@@ -9,7 +9,7 @@ import net.necromagic.simpletimerKT.Timer
  *
  */
 class MessageDelete : ListenerAdapter() {
-    
+
     /**
      * メッセージが削除された時に呼び出される
      *
@@ -34,6 +34,6 @@ class MessageDelete : ListenerAdapter() {
 
         //操作用リアクションを追加
         message.addReaction("\uD83D\uDED1").queue({}, {})
-        message.addReaction("❌").queue({} , {})
+        message.addReaction("❌").queue({}, {})
     }
 }

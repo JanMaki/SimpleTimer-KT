@@ -11,7 +11,7 @@ class MessageReply(private val any: Any) {
      * @param message [String]文字列
      * @return [Any]queueした結果
      */
-    fun reply(message: String): Any?{
+    fun reply(message: String): Any? {
         return when (any) {
             is Message -> {
                 any.reply(message).queue()
@@ -30,7 +30,7 @@ class MessageReply(private val any: Any) {
      * @param embed [MessageEmbed]埋め込み
      * @return [Any]queueした結果
      */
-    fun reply(embed: MessageEmbed): Any?{
+    fun reply(embed: MessageEmbed): Any? {
         return when (any) {
             is Message -> {
                 any.reply(embed).queue({}, {})

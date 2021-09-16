@@ -9,7 +9,7 @@ import net.necromagic.simpletimerKT.util.MessageReply
  * コマンドの処理のクラス
  *
  */
-class GuildMessageReceived: ListenerAdapter(){
+class GuildMessageReceived : ListenerAdapter() {
 
     /**
      * Guildからメッセージを受信した時に呼び出される
@@ -36,7 +36,7 @@ class GuildMessageReceived: ListenerAdapter(){
             .replace("  ", " ")
             .replace("　", " ")
             .replace("　　", " ")
-            .replace("！","!")
+            .replace("！", "!")
 
         //stringからargsの生成
         val args = messageValue.split(" ")

@@ -20,7 +20,8 @@ import kotlin.collections.HashSet
 /**
  * タイマーのコマンドのクラス
  */
-class TimerCommand: CommandData("timer","タイマーを開始します。タイマーの操作は!!timerコマンドを使用してください。"), RunCommand, Timer.FinishListener {
+class TimerCommand : CommandData("timer", "タイマーを開始します。タイマーの操作は!!timerコマンドを使用してください。"), RunCommand,
+    Timer.FinishListener {
 
     init {
         setDefaultEnabled(true)
@@ -42,10 +43,10 @@ class TimerCommand: CommandData("timer","タイマーを開始します。タイ
         val prefix = SimpleTimer.instance.config.getPrefix(channel.guild)
 
         //labelの確認・ヘルプの表示
-        if (args.size < 2){
+        if (args.size < 2) {
             try {
                 channel.sendMessage(createHelpEmbedBuilder(prefix)).queue({}, {})
-            }catch (e: InsufficientPermissionException){
+            } catch (e: InsufficientPermissionException) {
                 SendMessage.sendErrorMessageToUser(user)
             }
             return
@@ -56,19 +57,19 @@ class TimerCommand: CommandData("timer","タイマーを開始します。タイ
         val channelTimers = channelsTimersMap.getOrPut(channel) { EnumMap(Timer.Number::class.java) }
 
         //コマンドの実装
-        if (label.equalsIgnoreCase("add")){
-            if (args.size < 4){
+        if (label.equalsIgnoreCase("add")) {
+            if (args.size < 4) {
                 SendMessage.sendMessage(channel, "${prefix}timer add #1|#2|#3|#4 分", user)
                 return
             }
             try {
                 val i = Integer.parseInt(args[2].replace("#", ""))
-                if (i > 4 || i < 1){
+                if (i > 4 || i < 1) {
                     SendMessage.sendMessage(channel, "${prefix}timer add #1|#2|#3|#4 秒", user)
                     return
                 }
                 val number = Timer.Number.getNumber(i)
-                if (!channelTimers.containsKey(number)){
+                if (!channelTimers.containsKey(number)) {
                     if (number != null)
                         SendMessage.sendMessage(channel, number.format("タイマーは動いていません"), user)
                     return
@@ -76,186 +77,194 @@ class TimerCommand: CommandData("timer","タイマーを開始します。タイ
                 val time = Integer.parseInt(args[3])
                 val timer = channelTimers[number]!!
                 timer.addTimer(time)
-            }catch (e: Exception){
+            } catch (e: Exception) {
                 SendMessage.sendMessage(channel, "${prefix}timer add #1|#2|#3|#4 秒", user)
             }
-        } else if (label.equalsIgnoreCase("check")){
-            if (args.size < 3){
+        } else if (label.equalsIgnoreCase("check")) {
+            if (args.size < 3) {
                 SendMessage.sendMessage(channel, "${prefix}timer check #1|#2|#3|#4", user)
                 return
             }
             try {
                 val i = Integer.parseInt(args[2].replace("#", ""))
-                if (i > 4 || i < 1){
+                if (i > 4 || i < 1) {
                     SendMessage.sendMessage(channel, "${prefix}timer check #1|#2|#3|#4", user)
                     return
                 }
                 val number = Timer.Number.getNumber(i)
-                if (!channelTimers.containsKey(number)){
+                if (!channelTimers.containsKey(number)) {
                     if (number != null)
                         SendMessage.sendMessage(channel, number.format("タイマーは動いていません"), user)
                     return
                 }
                 val timer = channelTimers[number]!!
                 timer.check()
-            }catch (e: java.lang.Exception){
+            } catch (e: java.lang.Exception) {
                 SendMessage.sendMessage(channel, "${prefix}timer check #1|#2|#3|#4", user)
             }
-        } else if (label.equalsIgnoreCase("finish") || label.equalsIgnoreCase("fin")){
-            if (args.size < 3){
+        } else if (label.equalsIgnoreCase("finish") || label.equalsIgnoreCase("fin")) {
+            if (args.size < 3) {
                 SendMessage.sendMessage(channel, "${prefix}timer fin #1|#2|#3|#4", user)
                 return
             }
             try {
                 val i = Integer.parseInt(args[2].replace("#", ""))
-                if (i > 4 || i < 1){
+                if (i > 4 || i < 1) {
                     SendMessage.sendMessage(channel, "${prefix}timer fin #1|#2|#3|#4", user)
                     return
                 }
                 val number = Timer.Number.getNumber(i)
-                if (!channelTimers.containsKey(number)){
+                if (!channelTimers.containsKey(number)) {
                     if (number != null)
                         SendMessage.sendMessage(channel, number.format("タイマーは動いていません"), user)
                     return
                 }
                 val timer = channelTimers[number]!!
                 timer.finish()
-            }catch (e: Exception){
+            } catch (e: Exception) {
                 SendMessage.sendMessage(channel, "${prefix}timer fin #1|#2|#3|#4", user)
             }
-        }else if (label.equalsIgnoreCase("finishAll") || label.equalsIgnoreCase("finAll")){
-            if (channelTimers.keys.size == 0){
+        } else if (label.equalsIgnoreCase("finishAll") || label.equalsIgnoreCase("finAll")) {
+            if (channelTimers.keys.size == 0) {
                 SendMessage.sendMessage(channel, "タイマーは動いていません", user)
             }
             val timers = HashSet<Timer>()
-            for (number in Timer.Number.values()){
+            for (number in Timer.Number.values()) {
                 val timer = channelTimers[number]
                 if (timer != null)
                     timers.add(timer)
             }
-            for (timer in timers){
+            for (timer in timers) {
                 timer.finish()
             }
-        }else if (label.equalsIgnoreCase("stop")){
-            if (args.size < 3){
+        } else if (label.equalsIgnoreCase("stop")) {
+            if (args.size < 3) {
                 SendMessage.sendMessage(channel, "${prefix}timer stop #1|#2|#3|#4", user)
                 return
             }
             try {
                 val i = Integer.parseInt(args[2].replace("#", ""))
-                if (i > 4 || i < 1){
+                if (i > 4 || i < 1) {
                     SendMessage.sendMessage(channel, "${prefix}timer stop #1|#2|#3|#4", user)
                     return
                 }
                 val number = Timer.Number.getNumber(i)
-                if (!channelTimers.containsKey(number)){
+                if (!channelTimers.containsKey(number)) {
                     if (number != null)
                         SendMessage.sendMessage(channel, number.format("タイマーは動いていません"), user)
                     return
                 }
                 val timer = channelTimers[number]!!
                 timer.stop()
-            }catch (e: Exception){
+            } catch (e: Exception) {
                 SendMessage.sendMessage(channel, "${prefix}timer stop #1|#2|#3|#4", user)
             }
-        }else if (label.equalsIgnoreCase("restart")){
-            if (args.size < 3){
+        } else if (label.equalsIgnoreCase("restart")) {
+            if (args.size < 3) {
                 SendMessage.sendMessage(channel, "${prefix}timer restart #1|#2|#3|#4", user)
                 return
             }
             try {
                 val i = Integer.parseInt(args[2].replace("#", ""))
-                if (i > 4 || i < 1){
+                if (i > 4 || i < 1) {
                     SendMessage.sendMessage(channel, "${prefix}timer restart #1|#2|#3|#4", user)
                     return
                 }
                 val number = Timer.Number.getNumber(i)
-                if (!channelTimers.containsKey(number)){
+                if (!channelTimers.containsKey(number)) {
                     if (number != null)
                         SendMessage.sendMessage(channel, number.format("タイマーは動いていません"), user)
                     return
                 }
                 val timer = channelTimers[number]!!
                 timer.restart()
-            }catch (e: Exception){
+            } catch (e: Exception) {
                 SendMessage.sendMessage(channel, "${prefix}timer restart #1|#2|#3|#4", user)
             }
-        } else if (label.equalsIgnoreCase("finishtts")){
-            if (args.size < 3){
-                SendMessage.sendMessage(channel,"${prefix}timer finishtts <Message>", user)
+        } else if (label.equalsIgnoreCase("finishtts")) {
+            if (args.size < 3) {
+                SendMessage.sendMessage(channel, "${prefix}timer finishtts <Message>", user)
                 return
             }
             val mes = args[2]
-            if (mes.length > 40){
+            if (mes.length > 40) {
                 SendMessage.sendMessage(channel, "終了時のTTSメッセージは50文字以下にしてください", user)
             }
             SimpleTimer.instance.config.setFinishTTS(channel.guild, mes)
             SimpleTimer.instance.config.save()
             SendMessage.sendMessage(channel, "終了時のTTSメッセージを変更しました", user)
-        }else if (label.equalsIgnoreCase("tts")) {
-            if (args.size < 3){
-                SendMessage.sendMessage(channel,"${prefix}timer tts lv0/lv1/lv2/lv3", user)
+        } else if (label.equalsIgnoreCase("tts")) {
+            if (args.size < 3) {
+                SendMessage.sendMessage(channel, "${prefix}timer tts lv0/lv1/lv2/lv3", user)
                 return
             }
             val timing = when {
-                args[2].equalsIgnoreCase("LV1")->ServerConfig.TTSTiming.LV1
-                args[2].equalsIgnoreCase("LV2")->ServerConfig.TTSTiming.LV2
-                args[2].equalsIgnoreCase("LV3")->ServerConfig.TTSTiming.LV3
+                args[2].equalsIgnoreCase("LV1") -> ServerConfig.TTSTiming.LV1
+                args[2].equalsIgnoreCase("LV2") -> ServerConfig.TTSTiming.LV2
+                args[2].equalsIgnoreCase("LV3") -> ServerConfig.TTSTiming.LV3
                 else -> ServerConfig.TTSTiming.LV0
             }
             SimpleTimer.instance.config.setTTS(channel.guild, timing)
             SendMessage.sendMessage(channel, "チャットの読み上げを${timing}にしました", user)
             SimpleTimer.instance.config.save()
-        }else if (label.equalsIgnoreCase("mention")) {
-            if (args.size < 3){
-                SendMessage.sendMessage(channel,"${prefix}timer mention off/here/vc", user)
+        } else if (label.equalsIgnoreCase("mention")) {
+            if (args.size < 3) {
+                SendMessage.sendMessage(channel, "${prefix}timer mention off/here/vc", user)
                 return
             }
-            val mention = when(args[2]){
+            val mention = when (args[2]) {
                 "off" -> ServerConfig.Mention.NONE
                 "here" -> ServerConfig.Mention.HERE
                 "vc" -> ServerConfig.Mention.VC
                 else -> {
-                    SendMessage.sendMessage(channel,"${prefix}timer mention off/here/vc", user)
+                    SendMessage.sendMessage(channel, "${prefix}timer mention off/here/vc", user)
                     return
                 }
             }
             SimpleTimer.instance.config.setMention(channel.guild, mention)
             SendMessage.sendMessage(channel, "メンションの設定を${mention}にしました", user)
             SimpleTimer.instance.config.save()
-        }else if (label.equalsIgnoreCase("prefix")){
-            val newPrefix = if (args.size < 3) {"!"} else {args[2]}
-            if (!prefix.equalsIgnoreCase("!") && prefix.equalsIgnoreCase(newPrefix)){
+        } else if (label.equalsIgnoreCase("prefix")) {
+            val newPrefix = if (args.size < 3) {
+                "!"
+            } else {
+                args[2]
+            }
+            if (!prefix.equalsIgnoreCase("!") && prefix.equalsIgnoreCase(newPrefix)) {
                 SendMessage.sendMessage(channel, "すでにPrefixは'${newPrefix}'になっています", user)
                 return
             }
-            if (newPrefix.length > 5){
+            if (newPrefix.length > 5) {
                 SendMessage.sendMessage(channel, "Prefixは５文字以下にしてください", user)
                 return
             }
             SimpleTimer.instance.config.setPrefix(channel.guild, newPrefix)
-            if (args.size < 3){
+            if (args.size < 3) {
                 SendMessage.sendMessage(channel, "Prefixをリセットしました", user)
-            }else {
+            } else {
                 SendMessage.sendMessage(channel, "Prefixを変更しました $prefix -> $newPrefix", user)
             }
             SimpleTimer.instance.config.save()
-        }else if (label.equalsIgnoreCase("count")){
+        } else if (label.equalsIgnoreCase("count")) {
             SendMessage.sendMessage(channel, "${Timer.getCount()}個のタイマーが稼働しています", user)
-        }else {
+        } else if (label.equalsIgnoreCase("log")) {
+            SimpleTimer.instance.config.set("LoggingServer.${channel.guild.id}", channel.id)
+            SimpleTimer.instance.config.save()
+            channel.sendMessage("設定を行いました").queue({}, {})
+        } else {
             val i: Int
             try {
                 i = Integer.parseInt(label)
-            }catch (e: Exception){
+            } catch (e: Exception) {
                 try {
                     channel.sendMessage(createHelpEmbedBuilder(prefix)).queue({}, {})
-                }catch (e2: InsufficientPermissionException){
+                } catch (e2: InsufficientPermissionException) {
                     error(user)
                 }
                 return
             }
-            for (number in Timer.Number.values()){
-                if (!channelTimers.containsKey(number)){
+            for (number in Timer.Number.values()) {
+                if (!channelTimers.containsKey(number)) {
                     val timer = Timer(channel, number, i)
                     timer.finishListener = this
                     channelTimers[number] = timer
@@ -280,7 +289,7 @@ class TimerCommand: CommandData("timer","タイマーを開始します。タイ
     private fun createHelpEmbedBuilder(prefix: String): MessageEmbed {
         //過去の履歴を確認する
         val messageEmbed = helpEmbedMap[prefix]
-        if (messageEmbed != null){
+        if (messageEmbed != null) {
             return messageEmbed
         }
         //新しく作成する
@@ -332,7 +341,7 @@ class TimerCommand: CommandData("timer","タイマーを開始します。タイ
      */
     override fun finish(timer: Timer) {
         val channelTimers = channelsTimersMap[timer.channel]
-        if (channelTimers != null){
+        if (channelTimers != null) {
             channelTimers.remove(timer.number)
             channelsTimersMap[timer.channel] = channelTimers
         }

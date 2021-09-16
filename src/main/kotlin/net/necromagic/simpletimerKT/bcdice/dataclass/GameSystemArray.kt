@@ -13,13 +13,6 @@ data class GameSystemArray(
     @SerialName("game_system")
     val game_system: Array<GameSystem>
 ) {
-    /*
-    /**
-     * Equalsの実装
-     *
-     * @param other [Any] 比較対象
-     * @return [Boolean] 比較の結果
-     */
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -31,14 +24,7 @@ data class GameSystemArray(
         return true
     }
 
-    /**
-     * HashCodeの生成の実装
-     *
-     * @return [Int] 生成結果
-     */
     override fun hashCode(): Int {
         return game_system.contentHashCode()
     }
-
-     */
 }

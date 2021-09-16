@@ -8,6 +8,6 @@ package net.necromagic.simpletimerKT.util
  * @param other [String] 対象の文字列
  * @return [Boolean] 合致したかの結果
  */
-fun String.equalsIgnoreCase(other: String): Boolean{
+fun String.equalsIgnoreCase(other: String): Boolean {
     return equals(other, true)
 }

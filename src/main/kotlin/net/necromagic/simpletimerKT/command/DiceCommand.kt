@@ -18,14 +18,14 @@ import java.awt.Color
 /**
  * ダイスのコマンドのクラス
  */
-class DiceCommand: CommandData("dice","ダイスの設定を変更します。"), RunCommand{
+class DiceCommand : CommandData("dice", "ダイスの設定を変更します。"), RunCommand {
 
     init {
         setDefaultEnabled(true)
 
-        addSubcommands(SubcommandData("mode","使うダイスをDefaultかBCDiceかを切り替えます"))
-        addSubcommands(SubcommandData("bot","BCDiceで使用するダイスボットを変更します"))
-        addSubcommands(SubcommandData("info","ダイスの使い方を表示します"))
+        addSubcommands(SubcommandData("mode", "使うダイスをDefaultかBCDiceかを切り替えます"))
+        addSubcommands(SubcommandData("bot", "BCDiceで使用するダイスボットを変更します"))
+        addSubcommands(SubcommandData("info", "ダイスの使い方を表示します"))
     }
 
     /**
@@ -35,13 +35,13 @@ class DiceCommand: CommandData("dice","ダイスの設定を変更します。")
      * @param args [List] 内容
      * @param messageReply [MessageReply] 返信を行うクラス。
      */
-    override fun runCommand(user: User, channel: TextChannel, args: List<String>, messageReply: MessageReply){
+    override fun runCommand(user: User, channel: TextChannel, args: List<String>, messageReply: MessageReply) {
         val prefix = SimpleTimer.instance.config.getPrefix(channel.guild)
-        if (args.size >= 2){
-            when{
+        if (args.size >= 2) {
+            when {
                 args[1].equalsIgnoreCase("mode") -> {
                     //ダイスモードを反転
-                    val diceMode = when(SimpleTimer.instance.config.getDiceMode(channel.guild)){
+                    val diceMode = when (SimpleTimer.instance.config.getDiceMode(channel.guild)) {
                         ServerConfig.DiceMode.Default -> {
                             ServerConfig.DiceMode.BCDice
                         }
@@ -49,7 +49,7 @@ class DiceCommand: CommandData("dice","ダイスの設定を変更します。")
                             ServerConfig.DiceMode.Default
                         }
                     }
-                    sendMessage(channel,"ダイスモードを**$diceMode**に変更しました", user)
+                    sendMessage(channel, "ダイスモードを**$diceMode**に変更しました", user)
                     //コンフィグへ保存
                     val config = SimpleTimer.instance.config
                     config.setDiceMode(guild = channel.guild, diceMode)
@@ -61,7 +61,7 @@ class DiceCommand: CommandData("dice","ダイスの設定を変更します。")
                     return
                 }
                 args[1].equalsIgnoreCase("info") -> {
-                    when(SimpleTimer.instance.config.getDiceMode(channel.guild)){
+                    when (SimpleTimer.instance.config.getDiceMode(channel.guild)) {
                         ServerConfig.DiceMode.Default -> {
                             Dice.printInfo(channel)
                         }
@@ -72,11 +72,11 @@ class DiceCommand: CommandData("dice","ダイスの設定を変更します。")
                     return
                 }
                 else -> {
-                    channel.sendMessage( createDiceHelpEmbedBuilder(prefix)).queue()
+                    channel.sendMessage(createDiceHelpEmbedBuilder(prefix)).queue()
                 }
             }
-        }else {
-            channel.sendMessage( createDiceHelpEmbedBuilder(prefix)).queue()
+        } else {
+            channel.sendMessage(createDiceHelpEmbedBuilder(prefix)).queue()
         }
         return
     }
@@ -92,7 +92,11 @@ class DiceCommand: CommandData("dice","ダイスの設定を変更します。")
         val helpEmbedBuilder = EmbedBuilder()
         helpEmbedBuilder.setTitle("DiceBot")
         helpEmbedBuilder.setColor(Color.BLUE)
-        helpEmbedBuilder.addField("${prefix}dice mode", "使うダイスをDefaultかBCDiceかを切り替えます\nDefault: SimpleTimer内に実装されているダイスボット\nBCDice: BCDice( https://bcdice.org/ )を使用する。CoCなどのダイスが仕様できます", false)
+        helpEmbedBuilder.addField(
+            "${prefix}dice mode",
+            "使うダイスをDefaultかBCDiceかを切り替えます\nDefault: SimpleTimer内に実装されているダイスボット\nBCDice: BCDice( https://bcdice.org/ )を使用する。CoCなどのダイスが仕様できます",
+            false
+        )
         helpEmbedBuilder.addField("${prefix}dice bot", "BCDiceのダイスを設定する画面を表示します", false)
         helpEmbedBuilder.addField("${prefix}dice info", "ダイスの使い方を表示します", false)
         return helpEmbedBuilder.build()
